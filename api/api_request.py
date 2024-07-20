@@ -1,5 +1,3 @@
-import asyncio
-
 import aiohttp
 
 from bot.config import Config, load_config

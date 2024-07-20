@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import Message
 
 from db.crud.crud_user import crud_user
-from db.db import User, get_async_session
+from db.db import get_async_session
 
 
 class SaveUserMiddleware(BaseMiddleware):

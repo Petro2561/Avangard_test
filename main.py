@@ -1,9 +1,8 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher, Router
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
@@ -15,32 +14,8 @@ from db.db import create_tables
 
 CHECK_INTERVAL = 60  # Check every 60 seconds
 
-logging.basicConfig(level=logging.INFO)
-
-
-# @router.message(Command("set"))
-# async def set_alert_command(message: Message):
-#     args = message.text.split()
-#     if len(args) != 4:
-#         await message.answer("Использование: /set <currency> <min_threshold> <max_threshold>")
-#         return
-
-#     currency = args[1].upper()
-#     try:
-#         min_threshold = float(args[2])
-#         max_threshold = float(args[3])
-#     except ValueError:
-#         await message.answer("Пороговые значения должны быть числами.")
-#         return
-
-#     chat_id = message.chat.id
-#     if chat_id not in alerts:
-#         alerts[chat_id] = []
-#     alerts[chat_id].append({'currency': currency, 'min': min_threshold, 'max': max_threshold})
-#     await message.answer(f'Оповещение установлено для {currency}: мин {min_threshold}, макс {max_threshold}')
-
-
 async def main():
+    logging.basicConfig(level=logging.INFO)
     config: Config = load_config()
     bot = Bot(token=config.tg_bot.token)
     storage = MemoryStorage()

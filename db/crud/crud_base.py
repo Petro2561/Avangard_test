@@ -1,9 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.db import Coin, User
-
-
 class CRUDBase:
     def __init__(self, model):
         self.model = model
@@ -28,7 +25,7 @@ class CRUDBase:
         await session.commit()
         await session.refresh(db_obj)
         return db_obj
-
+    
     async def update(self, db_obj, obj_in, session: AsyncSession):
         for field in obj_in:
             if hasattr(db_obj, field):
