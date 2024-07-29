@@ -8,11 +8,11 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from bot.config import Config, load_config
 from bot.handlers import router
-from bot.middleware import SaveUserMiddleware
+from bot.middleware import SaveUserMiddleware, DbSessionMiddleware
 from bot.sheduler import check_prices
-from db.db import create_tables
+from db.create_pool import create_pool
 
-CHECK_INTERVAL = 60  # Check every 60 seconds
+CHECK_INTERVAL = 60
 
 async def main():
     logging.basicConfig(level=logging.INFO)
@@ -21,9 +21,10 @@ async def main():
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
     scheduler = AsyncIOScheduler()
+    session_pool = await create_pool()
+    dp.message.middleware(DbSessionMiddleware(session_pool))
     dp.message.middleware(SaveUserMiddleware())
     dp.include_router(router)
-    await create_tables()
     scheduler.add_job(check_prices, IntervalTrigger(seconds=CHECK_INTERVAL), args=[bot])
     scheduler.start()
     await bot.delete_webhook(drop_pending_updates=True)

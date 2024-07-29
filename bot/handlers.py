@@ -6,6 +6,8 @@ from aiogram.types import Message
 from bot.service import create_or_update_coin, get_coin_by_name
 from bot.states import CurrencyFill
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 START_MESSAGE = (
     "Привет! Бот позволяет задавать криптовалюты для отслеживания кртических значений. Используйте /set_currency для установки валюты для отслеживания"
 )
@@ -47,11 +49,11 @@ async def fill_currency(message: Message, state: FSMContext):
 
 
 @router.message(StateFilter(CurrencyFill.fill_max))
-async def fill_currency(message: Message, state: FSMContext):
+async def fill_currency(message: Message, state: FSMContext, session: AsyncSession):
     await state.update_data(max_price=message.text)
     data = await state.get_data()
     if await get_coin_by_name(
-        coin_name=data["coin_name"], user_id=message.from_user.id
+        coin_name=data["coin_name"], user_id=message.from_user.id, session=session
     ):
         await message.answer(
             UPDATE_CURRENCY_MESSAGE.format(coin_name=data["coin_name"])
@@ -63,5 +65,5 @@ async def fill_currency(message: Message, state: FSMContext):
             max_price=data["max_price"],
         )
         await message.answer(set_success_message)
-    await create_or_update_coin(data, message.from_user.id)
+    await create_or_update_coin(data, message.from_user.id, session=session)
     await message.answer(ONE_MORE_MESSAGE)
